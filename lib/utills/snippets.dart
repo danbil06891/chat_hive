@@ -121,9 +121,7 @@ RoundedRectangleBorder getRoundShape({double? val}) =>
 
 BorderRadius getRoundBorder({double? val}) => BorderRadius.circular(val ?? 30);
 Widget getLoader() => const Center(child: CircularProgressIndicator());
-Widget loading(bool isLoad) => isLoad == true
-    ? const Center(child: CircularProgressIndicator())
-    : SizedBox();
+
 
 void alert(BuildContext context, String message,
     {bool info = false, IconData? icon, String? title}) {
