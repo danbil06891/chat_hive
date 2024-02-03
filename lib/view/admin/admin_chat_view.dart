@@ -47,7 +47,6 @@ class _AdminChatViewState extends State<AdminChatView> {
       appUserId: widget.userId,
     );
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
-    
   }
 
   @override
@@ -92,8 +91,6 @@ class _AdminChatViewState extends State<AdminChatView> {
                     itemBuilder: (context, index) {
                       Message message = messages[index];
                       bool isMe = message.senderId == widget.userId;
-                           
-                      print(isMe);
 
                       return MessageBubbleAdmin(isMe: isMe, message: message);
                     },
@@ -135,7 +132,6 @@ class _AdminChatViewState extends State<AdminChatView> {
   }
 }
 
-
 class MessageBubbleAdmin extends StatelessWidget {
   const MessageBubbleAdmin({
     super.key,
@@ -156,23 +152,20 @@ class MessageBubbleAdmin extends StatelessWidget {
           decoration: BoxDecoration(
             color: isMe ? Colors.grey : primaryColor,
             borderRadius: isMe
-                ? const  BorderRadius.only(
+                ? const BorderRadius.only(
                     topRight: Radius.circular(15),
                     bottomLeft: Radius.circular(15),
                     topLeft: Radius.circular(5),
-                    bottomRight: Radius.circular(15)
-                  )
+                    bottomRight: Radius.circular(15))
                 : const BorderRadius.only(
-                  topRight: Radius.circular(2),
+                    topRight: Radius.circular(2),
                     bottomLeft: Radius.circular(15),
                     topLeft: Radius.circular(15),
                     bottomRight: Radius.circular(15),
-                    
                   ),
           ),
-          margin: const EdgeInsets.symmetric(
-                               vertical: 5, horizontal: 10),
-                           padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisSize: MainAxisSize.max,
 
