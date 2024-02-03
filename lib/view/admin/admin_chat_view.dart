@@ -1,7 +1,6 @@
-import 'package:chathive/components/message_bubble.dart';
+import 'package:chathive/constants/color_constant.dart';
 import 'package:chathive/models/message_model.dart';
 import 'package:chathive/repo/chat_repo.dart';
-import 'package:chathive/repo/firebase_repo.dart';
 import 'package:chathive/repo/user_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/admin/admin_chat_home_view.dart';
@@ -55,7 +54,7 @@ class _AdminChatViewState extends State<AdminChatView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat with Usersss'),
+        title: const Text('Chat with Users'),
         leading: IconButton(
           onPressed: () {
             replace(
@@ -93,10 +92,10 @@ class _AdminChatViewState extends State<AdminChatView> {
                     itemBuilder: (context, index) {
                       Message message = messages[index];
                       bool isMe = message.senderId == widget.userId;
-                      
-                          isMe ? Alignment.centerLeft : Alignment.centerRight;
+                           
+                      print(isMe);
 
-                      return MessageBubble(isMe: isMe, message: message);
+                      return MessageBubbleAdmin(isMe: isMe, message: message);
                     },
                   );
                 } else {
@@ -134,4 +133,62 @@ class _AdminChatViewState extends State<AdminChatView> {
     _messageController.dispose();
     super.dispose();
   }
+}
+
+
+class MessageBubbleAdmin extends StatelessWidget {
+  const MessageBubbleAdmin({
+    super.key,
+    required this.isMe,
+    required this.message,
+  });
+
+  final bool isMe;
+
+  final Message message;
+
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: isMe
+            ? Alignment.topLeft
+            : Alignment.topRight, // Adjusted alignment logic
+        child: Container(
+          decoration: BoxDecoration(
+            color: isMe ? Colors.grey : primaryColor,
+            borderRadius: isMe
+                ? const  BorderRadius.only(
+                    topRight: Radius.circular(15),
+                    bottomLeft: Radius.circular(15),
+                    topLeft: Radius.circular(5),
+                    bottomRight: Radius.circular(15)
+                  )
+                : const BorderRadius.only(
+                  topRight: Radius.circular(2),
+                    bottomLeft: Radius.circular(15),
+                    topLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15),
+                    
+                  ),
+          ),
+          margin: const EdgeInsets.symmetric(
+                               vertical: 5, horizontal: 10),
+                           padding: const EdgeInsets.all(10),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+
+            crossAxisAlignment: isMe
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start, // Adjusted crossAxisAlignment
+            children: [
+              Text(
+                message.message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 }
