@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chathive/constants/color_constant.dart';
 import 'package:chathive/models/user_model.dart';
 import 'package:chathive/repo/user_repo.dart';
@@ -6,6 +8,7 @@ import 'package:chathive/view/auth/components/select_image_widget.dart';
 import 'package:chathive/view/auth/components/usertypes_dropdown.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -33,6 +36,7 @@ class _RegisterViewState extends State<RegisterView> {
   final formKey = GlobalKey<FormState>();
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  FirebaseStorage firebaseStorage = FirebaseStorage.instance;
   @override
   void initState() {
     // TODO: implement initState
@@ -127,7 +131,6 @@ class _RegisterViewState extends State<RegisterView> {
                         btnText: 'Register',
                         radius: 30,
                         onTap: () async {
-                          
                           try {
                             if (formKey.currentState!.validate()) {
                               if (registerState.selectedType == null) {
@@ -135,15 +138,16 @@ class _RegisterViewState extends State<RegisterView> {
                                     info: false);
                                 return;
                               }
-                            
+
                               await AuthRepo().createUser(
-                                   
                                   emailController.text, passwordController.text,
                                   function: () async {
-
                                 var uid = firebaseAuth.currentUser!.uid;
+
                                 UserModel userModel = UserModel(
-                                  uid: registerState.selectedType == 'Admin' ? 'Admin' : uid,
+                                  uid: registerState.selectedType == 'Admin'
+                                      ? 'Admin'
+                                      : uid,
                                   cnic: cnicController.text,
                                   name: nameController.text,
                                   email: emailController.text,
@@ -153,9 +157,10 @@ class _RegisterViewState extends State<RegisterView> {
                                   isApproved:
                                       registerState.selectedType == 'User',
                                 );
-                                await firebaseFirestore
-                                    .collection('users')
-                                    .add(userModel.toMap());
+
+                                await AuthRepo().uploadAllDetail(
+                                    registerState.selectImage, uid, userModel);
+
                                 if (!mounted) return;
                                 registerState.selectImageFile(null);
                                 registerState.selectType(null);
@@ -163,7 +168,7 @@ class _RegisterViewState extends State<RegisterView> {
                               });
                             }
                           } catch (e) {
-                            print('ss');
+                           
                             snack(context, e.toString(), info: false);
                           }
                         },

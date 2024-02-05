@@ -22,12 +22,12 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
     return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: Text('Chat with admin'),
+          title: const Text('Chat with admin'),
           actions: [
             IconButton(
                 onPressed: () async {
                   await AuthRepo().logout();
-                  replace(context, LoginView());
+                  push(context, LoginView());
                 },
                 icon: Icon(Icons.logout))
           ],
@@ -59,8 +59,9 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
 
   Widget _buildUserItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-
+    
     return ListTile(
+      leading: CircleAvatar(backgroundImage: data['imageUrl'] != null ? NetworkImage(data['imageUrl']) : Image.asset('assets/images/profile.png').image),
       title: Row(
         children: [
           Text(data['type']),
