@@ -1,5 +1,5 @@
+import 'package:chathive/repo/auth_repo.dart';
 import 'package:chathive/repo/chat_repo.dart';
-import 'package:chathive/repo/user_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/admin/admin_chat_view.dart';
 import 'package:chathive/view/auth/login_view.dart';
@@ -49,32 +49,43 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: Text('Loadding..'));
         }
-
-        return ListView(
-          children: snapshot.data!.docs.map((e) => _buildUserItem(e)).toList(),
-        );
+        var data = snapshot.data;
+        if (data!.docs.isNotEmpty) {
+          return ListView(
+            children:
+                snapshot.data!.docs.map((e) => _buildUserItem(e)).toList(),
+          );
+        } else {
+          return const Center(child: Text('No user found!'));
+        }
       },
     );
   }
 
-Widget _buildUserItem(DocumentSnapshot document){
-  Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-
+  Widget _buildUserItem(DocumentSnapshot document) {
+    Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
+    String firstLetter = ChatRepo().getFirstLetter(data['name']);
     return ListTile(
+      leading: CircleAvatar(
+        backgroundImage: data['imageUrl'].isNotEmpty ? NetworkImage(data['imageUrl']) : null,
+        child: data['imageUrl'].isEmpty ? Text(firstLetter) : null
+      ),
       title: Row(
         children: [
           Text(data['type']),
-          const SizedBox(width: 5,),
+          const SizedBox(
+            width: 5,
+          ),
           Text(data['name']),
         ],
       ),
       onTap: () {
-        
-        replace(context, AdminChatView(
-          userId: data['uid'],
-        ));
+        replace(
+            context,
+            AdminChatView(
+              userId: data['uid'],
+            ));
       },
     );
   }
 }
-

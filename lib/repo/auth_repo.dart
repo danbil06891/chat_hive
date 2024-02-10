@@ -1,10 +1,13 @@
 import 'dart:io';
 
+import 'package:chathive/constants/color_constant.dart';
 import 'package:chathive/models/user_model.dart';
 import 'package:chathive/utills/local_storage.dart';
+import 'package:chathive/utills/snippets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 
 class AuthRepo {
   static final instance = AuthRepo();
@@ -44,7 +47,9 @@ class AuthRepo {
 
   Future createUser(
     String email,
-    String password, {
+    String password, 
+    BuildContext context,
+    {
     Function? function,
   }) async {
     try {
@@ -56,8 +61,10 @@ class AuthRepo {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
+        snack(context, 'The account already exists for that email', color: redColor);
       } else if (e.code == 'email-already-in-use') {
         print('The account already exists for that email');
+        snack(context, 'The account already exists for that email', color: redColor);
       }
     } catch (e) {
       print(e);
@@ -114,5 +121,11 @@ class AuthRepo {
 
   Future<void> logout() async {
     await firebaseAuth.signOut();
+  }
+
+  Future<void> forgotPassword(String email) async{
+   
+   await firebaseAuth.sendPasswordResetEmail(email: email);
+
   }
 }

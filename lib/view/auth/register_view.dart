@@ -1,8 +1,6 @@
-import 'dart:io';
-
 import 'package:chathive/constants/color_constant.dart';
 import 'package:chathive/models/user_model.dart';
-import 'package:chathive/repo/user_repo.dart';
+import 'package:chathive/repo/auth_repo.dart';
 import 'package:chathive/states/register_state.dart';
 import 'package:chathive/view/auth/components/select_image_widget.dart';
 import 'package:chathive/view/auth/components/usertypes_dropdown.dart';
@@ -37,11 +35,7 @@ class _RegisterViewState extends State<RegisterView> {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   FirebaseStorage firebaseStorage = FirebaseStorage.instance;
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +134,7 @@ class _RegisterViewState extends State<RegisterView> {
                               }
 
                               await AuthRepo().createUser(
-                                  emailController.text, passwordController.text,
+                                  emailController.text, passwordController.text, context,
                                   function: () async {
                                 var uid = firebaseAuth.currentUser!.uid;
 

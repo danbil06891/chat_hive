@@ -1,8 +1,7 @@
 import 'package:chathive/constants/color_constant.dart';
 import 'package:chathive/models/message_model.dart';
+import 'package:chathive/repo/auth_repo.dart';
 import 'package:chathive/repo/chat_repo.dart';
-import 'package:chathive/repo/firebase_repo.dart';
-import 'package:chathive/repo/user_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/auth/login_view.dart';
 import 'package:chathive/view/user/user_chat_home_view.dart';
@@ -16,7 +15,7 @@ class UserChatView extends StatefulWidget {
   final String adminId;
 
   @override
-  _UserChatViewState createState() => _UserChatViewState();
+  State<UserChatView> createState() => _UserChatViewState();
 }
 
 class _UserChatViewState extends State<UserChatView> {
@@ -25,9 +24,9 @@ class _UserChatViewState extends State<UserChatView> {
   final ChatRepo _chatRepo = ChatRepo();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  void sendMessage() async {
+  void sendMessage() {
     if (_messageController.text.isNotEmpty) {
-      await _chatRepo.sendMessage(
+      _chatRepo.sendMessage(
           appUserId: firebaseAuth.currentUser!.uid,
           adminId: 'Admin',
           message: _messageController.text);
@@ -45,7 +44,6 @@ class _UserChatViewState extends State<UserChatView> {
       appUserId: firebaseAuth.currentUser!.uid,
     );
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
-     FirebaseRepo().initNotification();
   }
 
   @override
@@ -79,6 +77,7 @@ class _UserChatViewState extends State<UserChatView> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: Text('Loading..'));
                 }
+
                 if (snapshot.hasData) {
                   List<Message> messages = snapshot.data!;
                   return ListView.builder(
@@ -88,13 +87,11 @@ class _UserChatViewState extends State<UserChatView> {
                       Message message = messages[index];
                       bool isMe =
                           message.senderId == firebaseAuth.currentUser!.uid;
-                      
-                      return MessageBubbleUser(
 
+                      return MessageBubbleUser(
                         isMe: isMe,
                         message: message,
                       );
-                      
                     },
                   );
                 } else {
@@ -134,7 +131,6 @@ class _UserChatViewState extends State<UserChatView> {
   }
 }
 
-
 class MessageBubbleUser extends StatelessWidget {
   const MessageBubbleUser({
     super.key,
@@ -155,7 +151,7 @@ class MessageBubbleUser extends StatelessWidget {
           decoration: BoxDecoration(
             color: isMe ? primaryColor : Colors.grey,
             borderRadius: isMe
-                ? const  BorderRadius.only(
+                ? const BorderRadius.only(
                     topRight: Radius.circular(2),
                     bottomLeft: Radius.circular(15),
                     topLeft: Radius.circular(15),
@@ -165,12 +161,10 @@ class MessageBubbleUser extends StatelessWidget {
                     topRight: Radius.circular(15),
                     bottomLeft: Radius.circular(15),
                     topLeft: Radius.circular(5),
-                    bottomRight: Radius.circular(15)
-                  ),
+                    bottomRight: Radius.circular(15)),
           ),
-          margin: const EdgeInsets.symmetric(
-                               vertical: 5, horizontal: 10),
-                           padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisSize: MainAxisSize.max,
 

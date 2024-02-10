@@ -1,5 +1,5 @@
+import 'package:chathive/repo/auth_repo.dart';
 import 'package:chathive/repo/chat_repo.dart';
-import 'package:chathive/repo/user_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/auth/login_view.dart';
 import 'package:chathive/view/user/user_chat_view.dart';
@@ -47,21 +47,33 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
           return const Text('Error');
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: const Text('Loadding..'));
+          return const Center(child: Text('Loadding..'));
         }
-
-        return ListView(
-          children: snapshot.data!.docs.map((e) => _buildUserItem(e)).toList(),
-        );
+        if (snapshot.data!.docs.isNotEmpty) {
+          return ListView(
+            children:
+                snapshot.data!.docs.map((e) => _buildUserItem(e)).toList(),
+          );
+        } else {
+          return const Center(
+            child: Text('No admin found!'),
+          );
+        }
       },
     );
   }
 
   Widget _buildUserItem(DocumentSnapshot document) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
-    
+
+    String firstLetter = ChatRepo().getFirstLetter(data['name']);
+
     return ListTile(
-      leading: CircleAvatar(backgroundImage: data['imageUrl'] != null ? NetworkImage(data['imageUrl']) : Image.asset('assets/images/profile.png').image),
+      leading: CircleAvatar(
+        backgroundImage:
+            data['imageUrl'].isNotEmpty ? NetworkImage(data['imageUrl']) : null,
+        child: data['imageUrl'].isEmpty ? Text(firstLetter) : null,
+      ),
       title: Row(
         children: [
           Text(data['type']),
@@ -72,12 +84,12 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
         ],
       ),
       onTap: () {
-        
         replace(
-            context,
-            UserChatView(
-              adminId: data['uid'],
-            ));
+          context,
+          UserChatView(
+            adminId: data['uid'],
+          ),
+        );
       },
     );
   }

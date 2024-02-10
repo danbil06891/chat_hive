@@ -1,4 +1,4 @@
-import 'package:chathive/repo/user_repo.dart';
+import 'package:chathive/repo/auth_repo.dart';
 import 'package:chathive/utills/local_storage.dart';
 import 'package:chathive/view/admin/admin_CHAT_home_view.dart';
 import 'package:chathive/view/user/user_chat_home_view.dart';

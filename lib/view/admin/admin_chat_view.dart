@@ -1,7 +1,7 @@
 import 'package:chathive/constants/color_constant.dart';
 import 'package:chathive/models/message_model.dart';
+import 'package:chathive/repo/auth_repo.dart';
 import 'package:chathive/repo/chat_repo.dart';
-import 'package:chathive/repo/user_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/admin/admin_chat_home_view.dart';
 import 'package:chathive/view/auth/login_view.dart';
@@ -18,7 +18,7 @@ class AdminChatView extends StatefulWidget {
   final String userId;
 
   @override
-  _AdminChatViewState createState() => _AdminChatViewState();
+  State<AdminChatView> createState() => _AdminChatViewState();
 }
 
 class _AdminChatViewState extends State<AdminChatView> {
@@ -27,9 +27,9 @@ class _AdminChatViewState extends State<AdminChatView> {
   final ChatRepo _chatRepo = ChatRepo();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  void sendMessage() async {
+  void sendMessage()  {
     if (_messageController.text.isNotEmpty) {
-      await _chatRepo.sendMessage(
+       _chatRepo.sendMessage(
           appUserId: widget.userId,
           adminId: 'Admin',
           message: _messageController.text);

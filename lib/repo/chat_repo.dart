@@ -74,4 +74,16 @@ class ChatRepo extends ChangeNotifier {
       rethrow;
     }
   }
+
+  String getFirstLetter(String str) {
+    String result = '';
+
+    if (str.isNotEmpty) {
+      result = str[0];
+    } else {
+      result = '';
+    }
+
+    return result.toString();
+  }
 }
