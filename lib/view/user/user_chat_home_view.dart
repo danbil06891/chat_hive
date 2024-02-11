@@ -16,22 +16,19 @@ class UserChatHomeView extends StatefulWidget {
 
 class _UserChatHomeViewState extends State<UserChatHomeView> {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  late Future<String> currentMessageFuture;
-
+  String? currentMessageFuture;
+  String? chatRoomId;
   @override
   void initState() {
     super.initState();
-    currentMessageFuture = fetchCurrentMessage();
-  }
-
-  Future<String> fetchCurrentMessage() async {
-    String chatRoomId = constructChatRoomId(
+    
+    chatRoomId = constructChatRoomId(
       adminId: 'Admin',
       appUserId: firebaseAuth.currentUser!.uid,
     );
-    String message = await ChatRepo().getCurrentMessage(chatRoomId);
-    return message;
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -41,8 +38,8 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
         title: const Text('Chat with admin'),
         actions: [
           IconButton(
-            onPressed: ()  {
-               AuthRepo().logout();
+            onPressed: () {
+              AuthRepo().logout();
               push(context, const LoginView());
             },
             icon: const Icon(Icons.logout),
@@ -52,15 +49,17 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
       body: Column(
         children: [
           Expanded(
-            child: FutureBuilder<String>(
-              future: currentMessageFuture,
+            child: FutureBuilder<List<String>>(
+              future: ChatRepo().getCurrentMessage(chatRoomId!),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
-                  return _buildUserList(snapshot.data);
+                  List<String>? userChatList = snapshot.data;
+                  print('screen message: $userChatList');
+                  return _buildUserList(userChatList);
                 }
               },
             ),
@@ -70,7 +69,7 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
     );
   }
 
-  Widget _buildUserList(String? currentMessage) {
+  Widget _buildUserList(List<String>? userChatList) {
     return StreamBuilder<QuerySnapshot>(
       stream: ChatRepo().getUserByType(widget.type),
       builder: (context, snapshot) {
@@ -85,7 +84,7 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
         if (snapshot.data!.docs.isNotEmpty) {
           return ListView(
             children: snapshot.data!.docs
-                .map((e) => _buildUserItem(e, currentMessage))
+                .map((e) => _buildUserItem(e, userChatList))
                 .toList(),
           );
         } else {
@@ -97,7 +96,7 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
     );
   }
 
-  Widget _buildUserItem(DocumentSnapshot document, String? currentMessage) {
+  Widget _buildUserItem(DocumentSnapshot document, List<String>? userChatList) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
     String firstLetter = ChatRepo().getFirstLetter(data['name']);
@@ -120,13 +119,10 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
       ),
       subtitle: Row(
         children: [
-          Text(currentMessage ?? ''), // Use currentMessage if available
-          const SizedBox(
-            width: 5,
-          ),
-          Text(data['name']),
+          Text(userChatList![0]),
         ],
       ),
+      trailing: Expanded(child: Text(userChatList[1])),
       onTap: () {
         replace(
           context,
@@ -138,7 +134,3 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
     );
   }
 }
-
-
-  // Rest of your widget code...
-

@@ -8,6 +8,7 @@ import 'package:chathive/view/user/user_chat_home_view.dart';
 import 'package:chathive/view/widgets/custom_textfield.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class UserChatView extends StatefulWidget {
   const UserChatView({super.key, required this.adminId});
@@ -59,8 +60,8 @@ class _UserChatViewState extends State<UserChatView> {
         ),
         actions: [
           IconButton(
-            onPressed: ()  {
-               AuthRepo().logout();
+            onPressed: () {
+              AuthRepo().logout();
 
               push(context, const LoginView());
             },
@@ -85,12 +86,16 @@ class _UserChatViewState extends State<UserChatView> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       Message message = messages[index];
+                      DateTime dateTime = message.timeStamp.toDate();
+                      String formattedTime =
+                          DateFormat('h:mm a').format(dateTime);
                       bool isMe =
                           message.senderId == firebaseAuth.currentUser!.uid;
 
                       return MessageBubbleUser(
                         isMe: isMe,
                         message: message,
+                        time: formattedTime,
                       );
                     },
                   );
@@ -136,10 +141,11 @@ class MessageBubbleUser extends StatelessWidget {
     super.key,
     required this.isMe,
     required this.message,
+    required this.time,
   });
 
   final bool isMe;
-
+  final String time;
   final Message message;
 
   @override
@@ -172,13 +178,24 @@ class MessageBubbleUser extends StatelessWidget {
                 ? CrossAxisAlignment.end
                 : CrossAxisAlignment.start, // Adjusted crossAxisAlignment
             children: [
-              Text(
-                message.message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                ),
-              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+               
+                children: [
+                  Text(
+                    message.message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(width: 5,),
+                  Text(
+                    time,
+                    style: const TextStyle(color: whiteColor, fontSize: 10),
+                  )
+                ],
+              )
             ],
           ),
         ),

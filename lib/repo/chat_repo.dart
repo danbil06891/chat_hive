@@ -5,6 +5,7 @@ import 'package:chathive/utills/snippets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChatRepo extends ChangeNotifier {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
@@ -77,8 +78,9 @@ class ChatRepo extends ChangeNotifier {
     }
   }
 
-  Future<String> getCurrentMessage(String chatRoomId) async {
-    String currentMessage = '';
+  Future<List<String>> getCurrentMessage(String chatRoomId) async {
+    
+    List<String> messageList = [];
 
     try {
       QuerySnapshot querySnapshot = await firebaseFirestore
@@ -89,13 +91,21 @@ class ChatRepo extends ChangeNotifier {
           .limit(1)
           .get();
       if (querySnapshot.docs.isNotEmpty) {
-        currentMessage = querySnapshot.docs.first.get('message');
+        
+        messageList.add(querySnapshot.docs.first.get('message'));
+        Timestamp timeStamp = querySnapshot.docs.first.get('timeStamp');
+       
+         DateTime dateTime = timeStamp.toDate();
+         
+         String formattedTime = DateFormat('h:mm a').format(dateTime);
+         messageList.add(formattedTime);
+        //  messageList.add(dateTime.toString());
       }
     } catch (e) {
       print(e);
     }
-    print('Message: $currentMessage');
-    return currentMessage;
+    print('Message: $messageList');
+    return messageList;
   }
 
   String getFirstLetter(String str) {
