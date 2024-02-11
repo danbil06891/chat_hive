@@ -16,43 +16,77 @@ class UserChatHomeView extends StatefulWidget {
 
 class _UserChatHomeViewState extends State<UserChatHomeView> {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  late Future<String> currentMessageFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    currentMessageFuture = fetchCurrentMessage();
+  }
+
+  Future<String> fetchCurrentMessage() async {
+    String chatRoomId = constructChatRoomId(
+      adminId: 'Admin',
+      appUserId: firebaseAuth.currentUser!.uid,
+    );
+    String message = await ChatRepo().getCurrentMessage(chatRoomId);
+    return message;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text('Chat with admin'),
-          actions: [
-            IconButton(
-                onPressed: () async {
-                  await AuthRepo().logout();
-                  push(context, LoginView());
-                },
-                icon: Icon(Icons.logout))
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(child: _buildUserList()),
-          ],
-        ));
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const Text('Chat with admin'),
+        actions: [
+          IconButton(
+            onPressed: ()  {
+               AuthRepo().logout();
+              push(context, const LoginView());
+            },
+            icon: const Icon(Icons.logout),
+          )
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<String>(
+              future: currentMessageFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return _buildUserList(snapshot.data);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  Widget _buildUserList() {
+  Widget _buildUserList(String? currentMessage) {
     return StreamBuilder<QuerySnapshot>(
       stream: ChatRepo().getUserByType(widget.type),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return const Text('Error');
+          return Text('Error: ${snapshot.error}');
         }
+
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: Text('Loadding..'));
+          return const Center(child: CircularProgressIndicator());
         }
+
         if (snapshot.data!.docs.isNotEmpty) {
           return ListView(
-            children:
-                snapshot.data!.docs.map((e) => _buildUserItem(e)).toList(),
+            children: snapshot.data!.docs
+                .map((e) => _buildUserItem(e, currentMessage))
+                .toList(),
           );
         } else {
           return const Center(
@@ -63,13 +97,14 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
     );
   }
 
-  Widget _buildUserItem(DocumentSnapshot document) {
+  Widget _buildUserItem(DocumentSnapshot document, String? currentMessage) {
     Map<String, dynamic> data = document.data()! as Map<String, dynamic>;
 
     String firstLetter = ChatRepo().getFirstLetter(data['name']);
 
     return ListTile(
       leading: CircleAvatar(
+        radius: 25,
         backgroundImage:
             data['imageUrl'].isNotEmpty ? NetworkImage(data['imageUrl']) : null,
         child: data['imageUrl'].isEmpty ? Text(firstLetter) : null,
@@ -77,6 +112,15 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
       title: Row(
         children: [
           Text(data['type']),
+          const SizedBox(
+            width: 5,
+          ),
+          Text(data['name']),
+        ],
+      ),
+      subtitle: Row(
+        children: [
+          Text(currentMessage ?? ''), // Use currentMessage if available
           const SizedBox(
             width: 5,
           ),
@@ -94,3 +138,7 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
     );
   }
 }
+
+
+  // Rest of your widget code...
+

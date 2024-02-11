@@ -66,8 +66,8 @@ class _AdminChatViewState extends State<AdminChatView> {
         ),
         actions: [
           IconButton(
-            onPressed: () async {
-              await AuthRepo().logout();
+            onPressed: ()  {
+               AuthRepo().logout();
               push(context, const LoginView());
             },
             icon: const Icon(Icons.logout),

@@ -40,7 +40,7 @@ class UserModel {
       type: type ?? this.type,
       imageUrl: imageUrl ?? this.imageUrl,
       cnic: cnic ?? this.cnic,
-      isApproved: isApprovde ?? this.isApproved,
+      isApproved: isApprovde ?? isApproved,
       
     );
   }
@@ -60,14 +60,14 @@ class UserModel {
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
-    print('uid---------------------- ${map['uid']}');
-    print('name---------------------- ${map['name']}');
-    print('email---------------------- ${map['email']}');
-    print('phoneNo---------------------- ${map['phoneNo']}');
-    print('imageUrl---------------------- ${map['imageUrl']}');
-    print('cnic---------------------- ${map['cnic']}');
-    print('isApproved---------------------- ${map['isApproved']}');
-    print('type---------------------- ${map['type']}');
+    // print('uid---------------------- ${map['uid']}');
+    // print('name---------------------- ${map['name']}');
+    // print('email---------------------- ${map['email']}');
+    // print('phoneNo---------------------- ${map['phoneNo']}');
+    // print('imageUrl---------------------- ${map['imageUrl']}');
+    // print('cnic---------------------- ${map['cnic']}');
+    // print('isApproved---------------------- ${map['isApproved']}');
+    // print('type---------------------- ${map['type']}');
     
 
     return UserModel(

@@ -59,8 +59,8 @@ class _UserChatViewState extends State<UserChatView> {
         ),
         actions: [
           IconButton(
-            onPressed: () async {
-              await AuthRepo().logout();
+            onPressed: ()  {
+               AuthRepo().logout();
 
               push(context, const LoginView());
             },

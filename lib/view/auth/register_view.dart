@@ -35,7 +35,6 @@ class _RegisterViewState extends State<RegisterView> {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
   FirebaseStorage firebaseStorage = FirebaseStorage.instance;
- 
 
   @override
   Widget build(BuildContext context) {
@@ -134,8 +133,9 @@ class _RegisterViewState extends State<RegisterView> {
                               }
 
                               await AuthRepo().createUser(
-                                  emailController.text, passwordController.text, context,
-                                  function: () async {
+                                  emailController.text,
+                                  passwordController.text,
+                                  context, function: () async {
                                 var uid = firebaseAuth.currentUser!.uid;
 
                                 UserModel userModel = UserModel(
@@ -160,9 +160,9 @@ class _RegisterViewState extends State<RegisterView> {
                                 registerState.selectType(null);
                                 push(context, const LoginView());
                               });
+                              
                             }
                           } catch (e) {
-                           
                             snack(context, e.toString(), info: false);
                           }
                         },

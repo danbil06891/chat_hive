@@ -43,10 +43,7 @@ class Message {
   }
 
   factory Message.fromMap(Map<String, dynamic> map) {
-    print('senderId---------------------- ${map['senderId']}');
-    print('receiverId---------------------- ${map['receiverId']}');
-    print('timeStamp---------------------- ${map['timeStamp']}');
-    print('message---------------------- ${map['message']}');
+   
     
 
     return Message(

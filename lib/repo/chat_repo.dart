@@ -56,7 +56,9 @@ class ChatRepo extends ChangeNotifier {
     });
   }
 
-  Stream<QuerySnapshot> getUserByType(String type) {
+  Stream<QuerySnapshot> getUserByType(
+    String type,
+  ) {
     try {
       if (type == 'Admin') {
         return firebaseFirestore
@@ -73,6 +75,27 @@ class ChatRepo extends ChangeNotifier {
       print('Error: $e');
       rethrow;
     }
+  }
+
+  Future<String> getCurrentMessage(String chatRoomId) async {
+    String currentMessage = '';
+
+    try {
+      QuerySnapshot querySnapshot = await firebaseFirestore
+          .collection('chat_rooms')
+          .doc(chatRoomId)
+          .collection(chatRoomId)
+          .orderBy('timeStamp', descending: true)
+          .limit(1)
+          .get();
+      if (querySnapshot.docs.isNotEmpty) {
+        currentMessage = querySnapshot.docs.first.get('message');
+      }
+    } catch (e) {
+      print(e);
+    }
+    print('Message: $currentMessage');
+    return currentMessage;
   }
 
   String getFirstLetter(String str) {

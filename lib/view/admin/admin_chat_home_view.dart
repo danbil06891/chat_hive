@@ -16,7 +16,13 @@ class AdminChatHomeView extends StatefulWidget {
 
 class _AdminChatHomeViewState extends State<AdminChatHomeView> {
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-
+ 
+  @override
+  void initState() {
+  
+    super.initState();
+    
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,8 +31,8 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
           title: const Text('Chat with Users'),
           actions: [
             IconButton(
-                onPressed: () async {
-                  await AuthRepo().logout();
+                onPressed: ()  {
+                   AuthRepo().logout();
                   replace(context, const LoginView());
                 },
                 icon: const Icon(Icons.logout))
@@ -41,7 +47,7 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
 
   Widget _buildUserList() {
     return StreamBuilder<QuerySnapshot>(
-      stream: ChatRepo().getUserByType(widget.type),
+      stream: ChatRepo().getUserByType(widget.type,),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return const Text('Error');

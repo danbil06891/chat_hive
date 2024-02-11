@@ -1,5 +1,4 @@
 import 'package:chathive/repo/auth_repo.dart';
-import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/widgets/custom_textfield.dart';
 import 'package:chathive/view/widgets/loader_button.dart';
 import 'package:flutter/material.dart';
