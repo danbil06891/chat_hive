@@ -106,15 +106,18 @@ class ChatRepo extends ChangeNotifier {
     return messageList;
   }
 
+  void update(String val){
+    print('ss');
+  }
+
   Future<List<List<String>>> getAllSenderIdsForAdmin(String type) async {
-    
     List<List<String>> userDataList = [
       <String>[],
       <String>[],
       <String>[],
       <String>[],
+      <String>[],
     ];
-    
 
     QuerySnapshot? querySnapshot;
     String chatRoomId;
@@ -133,21 +136,19 @@ class ChatRepo extends ChangeNotifier {
 
       if (querySnapshot.docs.isNotEmpty) {
         for (var doc in querySnapshot.docs) {
-         
           String uid = doc.get('uid');
-          print('uid: $uid');
+
           userDataList[0].add(doc.get('name'));
           userDataList[1].add(doc.get('uid'));
           userDataList[2].add(doc.get('imageUrl'));
-          if(type == 'User'){
-            chatRoomId =
-              constructChatRoomId(adminId: 'Admin', appUserId: firebaseAuth.currentUser!.uid);
+
+          if (type == 'User') {
+            chatRoomId = constructChatRoomId(
+                adminId: 'Admin', appUserId: firebaseAuth.currentUser!.uid);
           } else {
-             chatRoomId =
-              constructChatRoomId(adminId: 'Admin', appUserId: uid);
+            chatRoomId = constructChatRoomId(adminId: 'Admin', appUserId: uid);
           }
-          
-          print(chatRoomId);
+
           QuerySnapshot querySnapshot = await firebaseFirestore
               .collection('chat_rooms')
               .doc(chatRoomId)
@@ -157,7 +158,11 @@ class ChatRepo extends ChangeNotifier {
               .get();
 
           for (var element in querySnapshot.docs) {
-            userDataList[3].add(element.get('message'));
+            Timestamp timeStamp = element.get('timeStamp');
+            DateTime dateTime = timeStamp.toDate();
+            String formattedTime = DateFormat('h:mm a').format(dateTime);
+            userDataList[3].add(formattedTime);
+            userDataList[4].add(element.get('message'));
           }
         }
       }
@@ -166,17 +171,5 @@ class ChatRepo extends ChangeNotifier {
     }
     print('listOfMessages: $userDataList');
     return userDataList;
-  }
-
-  String getFirstLetter(String str) {
-    String result = '';
-
-    if (str.isNotEmpty) {
-      result = str[0];
-    } else {
-      result = '';
-    }
-
-    return result.toString();
   }
 }

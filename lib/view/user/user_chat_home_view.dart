@@ -56,8 +56,8 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
                 return Text('Error: ${snapshot.error}');
               }
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+                return  Center(
+                  child: getLoader(),
                 );
               }
 
@@ -96,7 +96,7 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
 
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundImage: NetworkImage(imageUrl),
+                          backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
                           child: imageUrl.isEmpty ? Text(dataTitle[0]) : null,
                         ),
                         title: Text(dataTitle),

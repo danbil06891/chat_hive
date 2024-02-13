@@ -120,7 +120,7 @@ RoundedRectangleBorder getRoundShape({double? val}) =>
     RoundedRectangleBorder(borderRadius: getRoundBorder(val: val));
 
 BorderRadius getRoundBorder({double? val}) => BorderRadius.circular(val ?? 30);
-Widget getLoader() => const Center(child: CircularProgressIndicator());
+Widget getLoader() => const Center(child: CircularProgressIndicator(color: primaryColor,));
 
 
 void alert(BuildContext context, String message,
