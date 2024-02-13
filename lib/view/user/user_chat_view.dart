@@ -54,7 +54,7 @@ class _UserChatViewState extends State<UserChatView> {
         title: const Text('Chat with Admin'),
         leading: IconButton(
           onPressed: () {
-            replace(context, const UserChatHomeView());
+            replace(context, const UserChatHomeView(type: 'User',));
           },
           icon: const Icon(Icons.arrow_back),
         ),
@@ -78,7 +78,6 @@ class _UserChatViewState extends State<UserChatView> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: Text('Loading..'));
                 }
-
                 if (snapshot.hasData) {
                   List<Message> messages = snapshot.data!;
                   return ListView.builder(
@@ -180,7 +179,6 @@ class MessageBubbleUser extends StatelessWidget {
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
-               
                 children: [
                   Text(
                     message.message,
@@ -189,7 +187,9 @@ class MessageBubbleUser extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  const SizedBox(width: 5,),
+                  const SizedBox(
+                    width: 5,
+                  ),
                   Text(
                     time,
                     style: const TextStyle(color: whiteColor, fontSize: 10),

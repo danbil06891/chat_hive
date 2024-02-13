@@ -79,7 +79,6 @@ class ChatRepo extends ChangeNotifier {
   }
 
   Future<List<String>> getCurrentMessage(String chatRoomId) async {
-    
     List<String> messageList = [];
 
     try {
@@ -91,14 +90,13 @@ class ChatRepo extends ChangeNotifier {
           .limit(1)
           .get();
       if (querySnapshot.docs.isNotEmpty) {
-        
         messageList.add(querySnapshot.docs.first.get('message'));
         Timestamp timeStamp = querySnapshot.docs.first.get('timeStamp');
-       
-         DateTime dateTime = timeStamp.toDate();
-         
-         String formattedTime = DateFormat('h:mm a').format(dateTime);
-         messageList.add(formattedTime);
+
+        DateTime dateTime = timeStamp.toDate();
+
+        String formattedTime = DateFormat('h:mm a').format(dateTime);
+        messageList.add(formattedTime);
         //  messageList.add(dateTime.toString());
       }
     } catch (e) {
@@ -106,6 +104,68 @@ class ChatRepo extends ChangeNotifier {
     }
     print('Message: $messageList');
     return messageList;
+  }
+
+  Future<List<List<String>>> getAllSenderIdsForAdmin(String type) async {
+    
+    List<List<String>> userDataList = [
+      <String>[],
+      <String>[],
+      <String>[],
+      <String>[],
+    ];
+    
+
+    QuerySnapshot? querySnapshot;
+    String chatRoomId;
+    try {
+      if (type == 'Admin') {
+        querySnapshot = await firebaseFirestore
+            .collection('users')
+            .where('type', isEqualTo: 'User')
+            .get();
+      } else {
+        querySnapshot = await firebaseFirestore
+            .collection('users')
+            .where('type', isEqualTo: 'Admin')
+            .get();
+      }
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (var doc in querySnapshot.docs) {
+         
+          String uid = doc.get('uid');
+          print('uid: $uid');
+          userDataList[0].add(doc.get('name'));
+          userDataList[1].add(doc.get('uid'));
+          userDataList[2].add(doc.get('imageUrl'));
+          if(type == 'User'){
+            chatRoomId =
+              constructChatRoomId(adminId: 'Admin', appUserId: firebaseAuth.currentUser!.uid);
+          } else {
+             chatRoomId =
+              constructChatRoomId(adminId: 'Admin', appUserId: uid);
+          }
+          
+          print(chatRoomId);
+          QuerySnapshot querySnapshot = await firebaseFirestore
+              .collection('chat_rooms')
+              .doc(chatRoomId)
+              .collection(chatRoomId)
+              .orderBy('timeStamp', descending: true)
+              .limit(1)
+              .get();
+
+          for (var element in querySnapshot.docs) {
+            userDataList[3].add(element.get('message'));
+          }
+        }
+      }
+    } catch (e) {
+      print('Error getting sender IDs for admin: $e');
+    }
+    print('listOfMessages: $userDataList');
+    return userDataList;
   }
 
   String getFirstLetter(String str) {

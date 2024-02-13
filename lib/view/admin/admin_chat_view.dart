@@ -46,6 +46,7 @@ class _AdminChatViewState extends State<AdminChatView> {
       adminId: 'Admin',
       appUserId: widget.userId,
     );
+    print('chatRoomId: $chatRoomId');
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
   }
 
