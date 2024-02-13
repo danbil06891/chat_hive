@@ -1,3 +1,4 @@
+import 'package:chathive/constants/color_constant.dart';
 import 'package:chathive/repo/auth_repo.dart';
 import 'package:chathive/repo/chat_repo.dart';
 import 'package:chathive/utills/snippets.dart';
@@ -35,7 +36,8 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Chat with admin'),
+        title: const Text('Chat with admin', style: TextStyle(color: whiteColor),),
+        backgroundColor: primaryColor,
         actions: [
           IconButton(
             onPressed: () {
@@ -77,8 +79,9 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
                     List<String>? title = dataList[0];
                     List<String> userUid = dataList[1];
                     List<String> image = dataList[2];
-                    List<String> subtitle = dataList[3];
-
+                    List<String> timeStamp = dataList[3];
+                    List<String> subtitle = dataList[4];
+                    
                     // Debugging: Print the contents of title, userUid, subtitle
                     print('title: $title');
                     print('userUid: $userUid');
@@ -93,7 +96,8 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
                       String? dataSubTitle = subtitle[index];
                       String? uid = userUid[index];
                       String? imageUrl = image[index];
-
+                      String? time = timeStamp[index];
+                      print('subTitle: $dataSubTitle');
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
@@ -101,6 +105,7 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
                         ),
                         title: Text(dataTitle),
                         subtitle: Text(dataSubTitle),
+                        trailing: time.isNotEmpty ? Text(time) : null,
                         onTap: () {
                           replace(context, UserChatView(adminId: uid));
                         },

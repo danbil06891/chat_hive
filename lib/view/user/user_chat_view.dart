@@ -51,7 +51,8 @@ class _UserChatViewState extends State<UserChatView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat with Admin'),
+        title: const Text('Chat with Admin', style: TextStyle(color: whiteColor),),
+        backgroundColor: primaryColor,
         leading: IconButton(
           onPressed: () {
             replace(context, const UserChatHomeView(type: 'User',));
