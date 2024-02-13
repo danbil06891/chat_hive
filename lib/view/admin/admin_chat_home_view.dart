@@ -61,6 +61,7 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                   shrinkWrap: true,
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
+                    print('index: $index');
                     List<List<String>> dataList = snapshot.data!;
                     List<String>? title = dataList[0];
                     List<String> userUid = dataList[1];
