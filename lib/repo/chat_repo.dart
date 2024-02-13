@@ -145,8 +145,10 @@ class ChatRepo extends ChangeNotifier {
           if (type == 'User') {
             chatRoomId = constructChatRoomId(
                 adminId: 'Admin', appUserId: firebaseAuth.currentUser!.uid);
+                print(chatRoomId);
           } else {
             chatRoomId = constructChatRoomId(adminId: 'Admin', appUserId: uid);
+            
           }
 
           QuerySnapshot querySnapshot = await firebaseFirestore

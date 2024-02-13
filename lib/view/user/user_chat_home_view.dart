@@ -22,21 +22,22 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
   @override
   void initState() {
     super.initState();
-    
+
     chatRoomId = constructChatRoomId(
       adminId: 'Admin',
       appUserId: firebaseAuth.currentUser!.uid,
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Chat with admin', style: TextStyle(color: whiteColor),),
+        title: const Text(
+          'Chat with admin',
+          style: TextStyle(color: whiteColor),
+        ),
         backgroundColor: primaryColor,
         actions: [
           IconButton(
@@ -58,13 +59,10 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
                 return Text('Error: ${snapshot.error}');
               }
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return  Center(
+                return Center(
                   child: getLoader(),
                 );
               }
-
-              // Debugging: Print the contents of snapshot.data
-              print('snapshot.data: ${snapshot.data}');
 
               if (snapshot.data == null || snapshot.data!.isEmpty) {
                 return const Text('No data available.');
@@ -73,46 +71,39 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
               return Expanded(
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: snapshot.data!.length,
+                  itemCount: snapshot.data![0].length,
                   itemBuilder: (context, index) {
+                  
+                   
                     List<List<String>> dataList = snapshot.data!;
-                    List<String>? title = dataList[0];
-                    List<String> userUid = dataList[1];
-                    List<String> image = dataList[2];
-                    List<String> timeStamp = dataList[3];
-                    List<String> subtitle = dataList[4];
+                    String dataTitle =
+                        index < dataList[0].length ? dataList[0][index] : '';
+                       
+                   
+                    String dataSubTitle =
+                        index < dataList[4].length ? dataList[4][index] : '';
+                    String uid =
+                        index < dataList[1].length ? dataList[1][index] : '';
+                    String imageUrl =
+                        index < dataList[2].length ? dataList[2][index] : '';
+                    String time =
+                        index < dataList[3].length ? dataList[3][index] : '';
                     
-                    // Debugging: Print the contents of title, userUid, subtitle
-                    print('title: $title');
-                    print('userUid: $userUid');
-                    print('subtitle: $subtitle');
-
-                    // Check if index is within bounds
-                    if (index < title.length &&
-                        index < userUid.length &&
-                        index < subtitle.length &&
-                        index < image.length) {
-                      String? dataTitle = title[index];
-                      String? dataSubTitle = subtitle[index];
-                      String? uid = userUid[index];
-                      String? imageUrl = image[index];
-                      String? time = timeStamp[index];
-                      print('subTitle: $dataSubTitle');
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: imageUrl.isNotEmpty ? NetworkImage(imageUrl) : null,
-                          child: imageUrl.isEmpty ? Text(dataTitle[0]) : null,
-                        ),
-                        title: Text(dataTitle),
-                        subtitle: Text(dataSubTitle),
-                        trailing: time.isNotEmpty ? Text(time) : null,
-                        onTap: () {
-                          replace(context, UserChatView(adminId: uid));
-                        },
-                      );
-                    } else {
-                      return const SizedBox(); // Return an empty container if index is out of bounds
-                    }
+                    
+                   
+                    return ListTile(
+                      leading:  CircleAvatar(
+                        backgroundImage: imageUrl.isNotEmpty ?
+                            NetworkImage(imageUrl) : Image.asset('assets/images/profile.png').image,
+                        
+                      ) ,
+                      title: Text(dataTitle),
+                      subtitle: Text(dataSubTitle),
+                      trailing: Text(time),
+                      onTap: () {
+                        replace(context, UserChatView(adminId: uid));
+                      },
+                    );
                   },
                 ),
               );

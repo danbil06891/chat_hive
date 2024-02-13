@@ -72,8 +72,7 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                         index < userUid.length &&
                         index < subtitle.length &&
                         index < image.length &&
-                        index < timeStamp.length
-                        ) {
+                        index < timeStamp.length) {
                       String? dataTitle = title[index];
                       String? dataSubTitle = subtitle[index];
                       String? uid = userUid[index];
