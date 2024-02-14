@@ -29,7 +29,7 @@ class _UserChatViewState extends State<UserChatView> {
     if (_messageController.text.isNotEmpty) {
       _chatRepo.sendMessage(
           appUserId: firebaseAuth.currentUser!.uid,
-          adminId: 'Admin',
+          adminId: widget.adminId,
           message: _messageController.text);
       _messageController.clear();
     }

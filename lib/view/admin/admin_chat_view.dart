@@ -27,12 +27,12 @@ class _AdminChatViewState extends State<AdminChatView> {
 
   final ChatRepo _chatRepo = ChatRepo();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-
+  
   void sendMessage() {
     if (_messageController.text.isNotEmpty) {
       _chatRepo.sendMessage(
           appUserId: widget.userId,
-          adminId: 'Admin',
+          adminId: firebaseAuth.currentUser!.uid,
           message: _messageController.text);
       _messageController.clear();
     }
@@ -44,10 +44,10 @@ class _AdminChatViewState extends State<AdminChatView> {
   void initState() {
     super.initState();
     final String chatRoomId = constructChatRoomId(
-      adminId: 'Admin',
+      adminId: firebaseAuth.currentUser!.uid,
       appUserId: widget.userId,
     );
-
+    print(firebaseAuth.currentUser!.uid);
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
   }
 
@@ -93,6 +93,7 @@ class _AdminChatViewState extends State<AdminChatView> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       Message message = messages[index];
+
                       bool isMe = message.senderId == widget.userId;
                       DateTime dateTime = message.timeStamp.toDate();
                       String formattedTime =

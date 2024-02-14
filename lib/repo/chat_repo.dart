@@ -78,39 +78,11 @@ class ChatRepo extends ChangeNotifier {
     }
   }
 
-  Future<List<String>> getCurrentMessage(String chatRoomId) async {
-    List<String> messageList = [];
+ 
 
-    try {
-      QuerySnapshot querySnapshot = await firebaseFirestore
-          .collection('chat_rooms')
-          .doc(chatRoomId)
-          .collection(chatRoomId)
-          .orderBy('timeStamp', descending: true)
-          .limit(1)
-          .get();
-      if (querySnapshot.docs.isNotEmpty) {
-        messageList.add(querySnapshot.docs.first.get('message'));
-        Timestamp timeStamp = querySnapshot.docs.first.get('timeStamp');
+  
 
-        DateTime dateTime = timeStamp.toDate();
-
-        String formattedTime = DateFormat('h:mm a').format(dateTime);
-        messageList.add(formattedTime);
-        //  messageList.add(dateTime.toString());
-      }
-    } catch (e) {
-      print(e);
-    }
-    print('Message: $messageList');
-    return messageList;
-  }
-
-  void update(String val){
-    print('ss');
-  }
-
-  Future<List<List<String>>> getAllSenderIdsForAdmin(String type) async {
+  Future<List<List<String>>> getAllUserAdminDetails(String type) async {
     List<List<String>> userDataList = [
       <String>[],
       <String>[],
@@ -120,7 +92,7 @@ class ChatRepo extends ChangeNotifier {
     ];
 
     QuerySnapshot? querySnapshot;
-    String chatRoomId;
+
     try {
       if (type == 'Admin') {
         querySnapshot = await firebaseFirestore
@@ -138,20 +110,26 @@ class ChatRepo extends ChangeNotifier {
         for (var doc in querySnapshot.docs) {
           String uid = doc.get('uid');
 
+          // Add user data to respective lists
           userDataList[0].add(doc.get('name'));
-          userDataList[1].add(doc.get('uid'));
+          userDataList[1].add(uid); // UID
           userDataList[2].add(doc.get('imageUrl'));
 
+          String formattedTime = '';
+          String message = '';
+
+          
+          String chatRoomId = '';
           if (type == 'User') {
             chatRoomId = constructChatRoomId(
-                adminId: 'Admin', appUserId: firebaseAuth.currentUser!.uid);
-                print(chatRoomId);
-          } else {
-            chatRoomId = constructChatRoomId(adminId: 'Admin', appUserId: uid);
-            
+                adminId: uid, appUserId: firebaseAuth.currentUser!.uid);
+          } else if (type == 'Admin') {
+            chatRoomId = constructChatRoomId(
+                adminId: firebaseAuth.currentUser!.uid, appUserId: uid);
           }
 
-          QuerySnapshot querySnapshot = await firebaseFirestore
+          
+          QuerySnapshot messageSnapshot = await firebaseFirestore
               .collection('chat_rooms')
               .doc(chatRoomId)
               .collection(chatRoomId)
@@ -159,13 +137,15 @@ class ChatRepo extends ChangeNotifier {
               .limit(1)
               .get();
 
-          for (var element in querySnapshot.docs) {
-            Timestamp timeStamp = element.get('timeStamp');
+          if (messageSnapshot.docs.isNotEmpty) {
+            Timestamp timeStamp = messageSnapshot.docs[0].get('timeStamp');
             DateTime dateTime = timeStamp.toDate();
-            String formattedTime = DateFormat('h:mm a').format(dateTime);
-            userDataList[3].add(formattedTime);
-            userDataList[4].add(element.get('message'));
+            formattedTime = DateFormat('h:mm a').format(dateTime);
+            message = messageSnapshot.docs[0].get('message');
           }
+
+          userDataList[3].add(formattedTime);
+          userDataList[4].add(message);
         }
       }
     } catch (e) {
