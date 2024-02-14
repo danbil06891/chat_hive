@@ -4,7 +4,6 @@ import 'package:chathive/repo/chat_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/auth/login_view.dart';
 import 'package:chathive/view/user/user_chat_view.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class UserChatHomeView extends StatefulWidget {

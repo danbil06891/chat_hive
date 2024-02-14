@@ -78,10 +78,6 @@ class ChatRepo extends ChangeNotifier {
     }
   }
 
- 
-
-  
-
   Future<List<List<String>>> getAllUserAdminDetails(String type) async {
     List<List<String>> userDataList = [
       <String>[],
@@ -118,7 +114,6 @@ class ChatRepo extends ChangeNotifier {
           String formattedTime = '';
           String message = '';
 
-          
           String chatRoomId = '';
           if (type == 'User') {
             chatRoomId = constructChatRoomId(
@@ -128,7 +123,6 @@ class ChatRepo extends ChangeNotifier {
                 adminId: firebaseAuth.currentUser!.uid, appUserId: uid);
           }
 
-          
           QuerySnapshot messageSnapshot = await firebaseFirestore
               .collection('chat_rooms')
               .doc(chatRoomId)
@@ -154,4 +148,7 @@ class ChatRepo extends ChangeNotifier {
     print('listOfMessages: $userDataList');
     return userDataList;
   }
+
+  
+
 }
