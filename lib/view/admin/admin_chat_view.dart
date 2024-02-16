@@ -51,6 +51,15 @@ class _AdminChatViewState extends State<AdminChatView> {
     );
 
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
+
+    _messageStream!.listen((List<Message> messages) {
+      for (Message message in messages) {
+        if (message.receiverId == firebaseAuth.currentUser!.uid &&
+            !message.isSeen) {
+          _chatRepo.setMessageSeen(chatRoomId);
+        }
+      }
+    });
   }
 
   @override
@@ -94,11 +103,15 @@ class _AdminChatViewState extends State<AdminChatView> {
             child: StreamBuilder<List<Message>>(
               stream: _messageStream,
               builder: (context, snapshot) {
+                
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: Text('Loading..'));
                 }
+
                 if (snapshot.hasData) {
+                 
                   List<Message> messages = snapshot.data!;
+
                   return ListView.builder(
                     reverse: true,
                     itemCount: messages.length,
@@ -109,7 +122,7 @@ class _AdminChatViewState extends State<AdminChatView> {
                       DateTime dateTime = message.timeStamp.toDate();
                       String formattedTime =
                           DateFormat('h:mm a').format(dateTime);
-                      bool isSeen = message.isSeen!;
+                      bool isSeen = message.isSeen;
                       return MessageBubbleAdmin(
                         isMe: isMe,
                         message: message,
@@ -193,10 +206,8 @@ class MessageBubbleAdmin extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisSize: MainAxisSize.max,
-
-            crossAxisAlignment: isMe
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start, // Adjusted crossAxisAlignment
+            crossAxisAlignment:
+                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -218,16 +229,21 @@ class MessageBubbleAdmin extends StatelessWidget {
                   const SizedBox(
                     width: 5,
                   ),
-                  isSeen == true
-                      ? const Icon(
-                          Icons.done_all,
-                          color: Colors.blue,
-                        )
-                      : const Icon(
-                          Icons.done,
-                          color: whiteColor,
-                          size: 20,
-                        ),
+                  isMe == false?
+                    Row(
+                      children: [
+                        isSeen == true
+                            ? const Icon(
+                                Icons.done_all,
+                                color: doubleTickIconColor,
+                              )
+                            : const Icon(
+                                Icons.done,
+                                color: whiteColor,
+                                size: 20,
+                              ),
+                      ],
+                    ) : const SizedBox(),
                 ],
               )
             ],

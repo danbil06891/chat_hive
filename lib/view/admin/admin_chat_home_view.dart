@@ -58,7 +58,7 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                     fillerColor: whiteColor,
                     prefixIcon: IconButton(
                         onPressed: () {
-                          replace(context, const AdminChatHomeView());
+                          replace(context, const AdminChatHomeView(type: 'Admin',));
                         },
                         icon: const Icon(Icons.arrow_back)),
                     hintText: 'search',
@@ -118,14 +118,15 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
               }
 
               if (snapshot.data == null || snapshot.data!.isEmpty) {
-                return const Text('No data available.');
+                
+                return const Center(child: const Text('No data available.'));
               }
-
+              
               dataList = snapshot.data!;
 
               List<List<String>> filterList =
                   filterQuery(dataList, searchController.text);
-
+              
               return Expanded(
                 child: ListView(
                   children: [
@@ -148,8 +149,8 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                         String currentMessage = index < filterList[4].length
                             ? filterList[4][index]
                             : '';
-
-                        return ListTile(
+                        
+                        return  ListTile(
                           trailing: Text(time),
                           leading: CircleAvatar(
                             radius: 25,
@@ -163,7 +164,7 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                           onTap: () {
                             replace(context, AdminChatView(userId: uid));
                           },
-                        );
+                        ) ;
                       },
                     ),
                   ],

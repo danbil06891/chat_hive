@@ -30,7 +30,9 @@ class _UserChatViewState extends State<UserChatView> {
       _chatRepo.sendMessage(
           appUserId: firebaseAuth.currentUser!.uid,
           adminId: widget.adminId,
-          message: _messageController.text);
+          message: _messageController.text,
+          isSeen: false,
+          );
       _messageController.clear();
     }
   }
@@ -46,7 +48,7 @@ class _UserChatViewState extends State<UserChatView> {
     );
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
 
-    _messageStream!.listen((List<Message> messages) { 
+    _messageStream!.listen((List<Message> messages) {
       for(Message message in messages){
         if(message.receiverId == firebaseAuth.currentUser!.uid && !message.isSeen){
           _chatRepo.setMessageSeen(chatRoomId);
@@ -59,11 +61,18 @@ class _UserChatViewState extends State<UserChatView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat with Admin', style: TextStyle(color: whiteColor),),
+        title: const Text(
+          'Chat with Admin',
+          style: TextStyle(color: whiteColor),
+        ),
         backgroundColor: primaryColor,
         leading: IconButton(
           onPressed: () {
-            replace(context, const UserChatHomeView(type: 'User',));
+            replace(
+                context,
+                const UserChatHomeView(
+                  type: 'User',
+                ));
           },
           icon: const Icon(Icons.arrow_back),
         ),
@@ -99,11 +108,12 @@ class _UserChatViewState extends State<UserChatView> {
                           DateFormat('h:mm a').format(dateTime);
                       bool isMe =
                           message.senderId == firebaseAuth.currentUser!.uid;
-
+                      bool isSeen = message.isSeen;
                       return MessageBubbleUser(
                         isMe: isMe,
                         message: message,
                         time: formattedTime,
+                        isSeen: isSeen,
                       );
                     },
                   );
@@ -150,11 +160,13 @@ class MessageBubbleUser extends StatelessWidget {
     required this.isMe,
     required this.message,
     required this.time,
+    this.isSeen = false,
   });
 
   final bool isMe;
   final String time;
   final Message message;
+  final bool isSeen;
 
   @override
   Widget build(BuildContext context) => Align(
@@ -202,7 +214,25 @@ class MessageBubbleUser extends StatelessWidget {
                   Text(
                     time,
                     style: const TextStyle(color: whiteColor, fontSize: 10),
-                  )
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                 isMe == true?
+                    Row(
+                      children: [
+                        isSeen == true
+                            ? const Icon(
+                                Icons.done_all,
+                                color: doubleTickIconColor,
+                              )
+                            : const Icon(
+                                Icons.done,
+                                color: whiteColor,
+                                size: 20,
+                              ),
+                      ],
+                    ) : const SizedBox(),
                 ],
               )
             ],
