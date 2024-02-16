@@ -4,6 +4,7 @@ import 'package:chathive/repo/chat_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/admin/admin_chat_view.dart';
 import 'package:chathive/view/auth/login_view.dart';
+import 'package:chathive/view/widgets/custom_search_textfield.dart';
 import 'package:flutter/material.dart';
 
 class AdminChatHomeView extends StatefulWidget {
@@ -47,35 +48,30 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: isClick
-          ? AppBar(
-            backgroundColor: primaryColor,
-            leading: IconButton(onPressed: (){
-              setState(() {
-                isClick = false;
-              });
-            }, icon: const Icon(Icons.arrow_back)),
-            title: PreferredSize(
-            
-              preferredSize: Size.fromHeight(200),
-              child: SizedBox(
-                height: 50,
-                child: TextField(
-                  controller: searchController,
-                  onChanged: (value) {
-                    setState(() {
-                      filterList = filterQuery(dataList, value);
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Search',
-                    hintText: 'Enter your search query...',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(),
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(70),
+              child: AppBar(
+                backgroundColor: textFieldColor,
+                title: SizedBox(
+                  height: 55,
+                  child: CustomSearchTextField(
+                    fillerColor: whiteColor,
+                    prefixIcon: IconButton(
+                        onPressed: () {
+                          replace(context, const AdminChatHomeView());
+                        },
+                        icon: const Icon(Icons.arrow_back)),
+                    hintText: 'search',
+                    controller: searchController,
+                    onChange: (value) {
+                      setState(() {
+                        filterList = filterQuery(dataList, value);
+                      });
+                    },
                   ),
                 ),
               ),
-            ),
-          )
+            )
           : AppBar(
               automaticallyImplyLeading: false,
               title: const Text(
@@ -137,14 +133,8 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                       shrinkWrap: true,
                       itemCount: filterList[0].length,
                       itemBuilder: (context, index) {
-                        List<List<String>> dataList = snapshot.data!;
-
-                        String dataTitle = index < filterList[0].length
+                        String title = index < filterList[0].length
                             ? filterList[0][index]
-                            : '';
-
-                        String dataSubTitle = index < filterList[4].length
-                            ? filterList[4][index]
                             : '';
                         String uid = index < filterList[1].length
                             ? filterList[1][index]
@@ -154,6 +144,9 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                             : '';
                         String time = index < filterList[3].length
                             ? filterList[3][index]
+                            : '';
+                        String currentMessage = index < filterList[4].length
+                            ? filterList[4][index]
                             : '';
 
                         return ListTile(
@@ -165,8 +158,8 @@ class _AdminChatHomeViewState extends State<AdminChatHomeView> {
                                 : Image.asset('assets/images/profile.png')
                                     .image,
                           ),
-                          title: Text(dataTitle),
-                          subtitle: Text(dataSubTitle),
+                          title: Text(title),
+                          subtitle: Text(currentMessage),
                           onTap: () {
                             replace(context, AdminChatView(userId: uid));
                           },

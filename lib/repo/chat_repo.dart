@@ -4,6 +4,7 @@ import 'package:chathive/utills/local_storage.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -15,7 +16,9 @@ class ChatRepo extends ChangeNotifier {
   Future<void> sendMessage(
       {required String appUserId,
       required String adminId,
-      required String message}) async {
+      required String message,
+      bool? isSeen,
+      }) async {
     String rol = LocalStorage.getString(key: 'role');
 
     final Timestamp timestamp = Timestamp.now();
@@ -25,6 +28,7 @@ class ChatRepo extends ChangeNotifier {
       message: message,
       timeStamp: timestamp,
       receiverId: rol == 'Admin' ? appUserId : adminId,
+      isSeen: isSeen!,
     );
 
     String chatRoomId =
@@ -52,30 +56,26 @@ class ChatRepo extends ChangeNotifier {
           message: doc['message'],
           timeStamp: doc['timeStamp'],
           receiverId: doc['receiverId'],
+          isSeen: doc['isSeen'],
         );
       }).toList();
     });
   }
 
-  Stream<QuerySnapshot> getUserByType(
-    String type,
-  ) {
-    try {
-      if (type == 'Admin') {
-        return firebaseFirestore
-            .collection('users')
-            .where('type', isEqualTo: 'User')
-            .snapshots();
-      } else {
-        return firebaseFirestore
-            .collection('users')
-            .where('type', isEqualTo: 'Admin')
-            .snapshots();
-      }
-    } catch (e) {
-      print('Error: $e');
-      rethrow;
+  Future<void> setMessageSeen(String chatRoomId) async{
+   
+   QuerySnapshot messageRef = await firebaseFirestore.collection('chat_rooms').doc(chatRoomId).collection(chatRoomId).orderBy('timeStamp', descending: true).limit(1).get();
+  
+   if(messageRef.docs.isNotEmpty){
+    DocumentSnapshot latestMessage = messageRef.docs.first;
+
+    await latestMessage.reference.update({'isSeen': true});
+   } else {
+    if (kDebugMode) {
+      print('No Messages found in the chat room');
     }
+   }
+
   }
 
   Future<List<List<String>>> getAllUserAdminDetails(String type) async {
@@ -148,7 +148,4 @@ class ChatRepo extends ChangeNotifier {
     print('listOfMessages: $userDataList');
     return userDataList;
   }
-
-  
-
 }

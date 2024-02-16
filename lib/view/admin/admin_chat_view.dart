@@ -27,13 +27,15 @@ class _AdminChatViewState extends State<AdminChatView> {
 
   final ChatRepo _chatRepo = ChatRepo();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  
+
   void sendMessage() {
     if (_messageController.text.isNotEmpty) {
       _chatRepo.sendMessage(
-          appUserId: widget.userId,
-          adminId: firebaseAuth.currentUser!.uid,
-          message: _messageController.text);
+        appUserId: widget.userId,
+        adminId: firebaseAuth.currentUser!.uid,
+        message: _messageController.text,
+        isSeen: false,
+      );
       _messageController.clear();
     }
   }
@@ -47,15 +49,18 @@ class _AdminChatViewState extends State<AdminChatView> {
       adminId: firebaseAuth.currentUser!.uid,
       appUserId: widget.userId,
     );
-    print(firebaseAuth.currentUser!.uid);
+
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
   }
 
-  @override  
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat with Users', style: TextStyle(color: whiteColor), ),
+        title: const Text(
+          'Chat with Users',
+          style: TextStyle(color: whiteColor),
+        ),
         backgroundColor: primaryColor,
         leading: IconButton(
           onPressed: () {
@@ -65,7 +70,10 @@ class _AdminChatViewState extends State<AdminChatView> {
                   type: 'Admin',
                 ));
           },
-          icon: const Icon(Icons.arrow_back, color: whiteColor,),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: whiteColor,
+          ),
         ),
         actions: [
           IconButton(
@@ -73,7 +81,10 @@ class _AdminChatViewState extends State<AdminChatView> {
               AuthRepo().logout();
               push(context, const LoginView());
             },
-            icon: const Icon(Icons.logout, color: whiteColor,),
+            icon: const Icon(
+              Icons.logout,
+              color: whiteColor,
+            ),
           )
         ],
       ),
@@ -98,7 +109,13 @@ class _AdminChatViewState extends State<AdminChatView> {
                       DateTime dateTime = message.timeStamp.toDate();
                       String formattedTime =
                           DateFormat('h:mm a').format(dateTime);
-                      return MessageBubbleAdmin(isMe: isMe, message: message, time: formattedTime,);
+                      bool isSeen = message.isSeen!;
+                      return MessageBubbleAdmin(
+                        isMe: isMe,
+                        message: message,
+                        time: formattedTime,
+                        isSeen: isSeen,
+                      );
                     },
                   );
                 } else {
@@ -143,13 +160,14 @@ class MessageBubbleAdmin extends StatelessWidget {
     super.key,
     required this.isMe,
     required this.message,
-    required this.time
+    required this.time,
+    this.isSeen = false,
   });
 
   final bool isMe;
   final String time;
   final Message message;
-
+  final bool isSeen;
   @override
   Widget build(BuildContext context) => Align(
         alignment: isMe
@@ -196,7 +214,20 @@ class MessageBubbleAdmin extends StatelessWidget {
                   Text(
                     time,
                     style: const TextStyle(color: whiteColor, fontSize: 10),
-                  )
+                  ),
+                  const SizedBox(
+                    width: 5,
+                  ),
+                  isSeen == true
+                      ? const Icon(
+                          Icons.done_all,
+                          color: Colors.blue,
+                        )
+                      : const Icon(
+                          Icons.done,
+                          color: whiteColor,
+                          size: 20,
+                        ),
                 ],
               )
             ],

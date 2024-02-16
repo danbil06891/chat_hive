@@ -45,6 +45,14 @@ class _UserChatViewState extends State<UserChatView> {
       appUserId: firebaseAuth.currentUser!.uid,
     );
     _messageStream = _chatRepo.getMessageStream(chatRoomId);
+
+    _messageStream!.listen((List<Message> messages) { 
+      for(Message message in messages){
+        if(message.receiverId == firebaseAuth.currentUser!.uid && !message.isSeen){
+          _chatRepo.setMessageSeen(chatRoomId);
+        }
+      }
+    });
   }
 
   @override

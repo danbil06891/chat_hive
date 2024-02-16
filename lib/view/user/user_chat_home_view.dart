@@ -4,6 +4,7 @@ import 'package:chathive/repo/chat_repo.dart';
 import 'package:chathive/utills/snippets.dart';
 import 'package:chathive/view/auth/login_view.dart';
 import 'package:chathive/view/user/user_chat_view.dart';
+import 'package:chathive/view/widgets/custom_search_textfield.dart';
 import 'package:flutter/material.dart';
 
 class UserChatHomeView extends StatefulWidget {
@@ -14,26 +15,92 @@ class UserChatHomeView extends StatefulWidget {
 }
 
 class _UserChatHomeViewState extends State<UserChatHomeView> {
+  TextEditingController searchController = TextEditingController();
+  bool isClick = false;
+  List<List<String>> filterList = [];
+  late List<List<String>> dataList;
+  List<List<String>> filterQuery(List<List<String>> dataList, String query) {
+    if (query.isEmpty) {
+      return dataList;
+    }
+    List<List<String>> filteredQuery = [
+      [],
+      [],
+      [],
+      [],
+      [],
+    ];
+    for (int i = 0; i < dataList[0].length; i++) {
+      if (dataList[0][i].toLowerCase().contains(query.toLowerCase())) {
+        filteredQuery[0].add(dataList[0][i]);
+        filteredQuery[1].add(dataList[1][i]);
+        filteredQuery[2].add(dataList[2][i]);
+        filteredQuery[3].add(dataList[3][i]);
+        filteredQuery[4].add(dataList[4][i]);
+      }
+    }
+
+    return filteredQuery;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'Chat with admin',
-          style: TextStyle(color: whiteColor),
-        ),
-        backgroundColor: primaryColor,
-        actions: [
-          IconButton(
-            onPressed: () {
-              AuthRepo().logout();
-              push(context, const LoginView());
-            },
-            icon: const Icon(Icons.logout),
-          )
-        ],
-      ),
+      appBar: isClick
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(70),
+              child: AppBar(
+                backgroundColor: textFieldColor,
+                title: SizedBox(
+                  height: 55,
+                  child: CustomSearchTextField(
+                    fillerColor: whiteColor,
+                    prefixIcon: IconButton(
+                        onPressed: () {
+                          replace(context, const UserChatHomeView());
+                        },
+                        icon: const Icon(Icons.arrow_back)),
+                    hintText: 'search',
+                    controller: searchController,
+                    onChange: (value) {
+                      setState(() {
+                        filterList = filterQuery(dataList, value);
+                      });
+                    },
+                  ),
+                ),
+              ),
+            )
+          : AppBar(
+              automaticallyImplyLeading: false,
+              title: const Text(
+                'Chat with Admin',
+                style: TextStyle(color: whiteColor),
+              ),
+              backgroundColor: primaryColor,
+              actions: [
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isClick = !isClick;
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.search,
+                      color: whiteColor,
+                    )),
+                IconButton(
+                  onPressed: () {
+                    AuthRepo().logout();
+                    replace(context, const LoginView());
+                  },
+                  icon: const Icon(
+                    Icons.logout,
+                    color: whiteColor,
+                  ),
+                ),
+              ],
+            ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -53,23 +120,31 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
                 return const Text('No data available.');
               }
 
+              dataList = snapshot.data!;
+
+              List<List<String>> filterList =
+                  filterQuery(dataList, searchController.text);
+
               return Expanded(
                 child: ListView.builder(
                   shrinkWrap: true,
-                  itemCount: snapshot.data![0].length,
+                  itemCount: filterList[0].length,
                   itemBuilder: (context, index) {
-                    List<List<String>> dataList = snapshot.data!;
-                    String dataTitle =
-                        index < dataList[0].length ? dataList[0][index] : '';
-
-                    String dataSubTitle =
-                        index < dataList[4].length ? dataList[4][index] : '';
-                    String uid =
-                        index < dataList[1].length ? dataList[1][index] : '';
-                    String imageUrl =
-                        index < dataList[2].length ? dataList[2][index] : '';
-                    String time =
-                        index < dataList[3].length ? dataList[3][index] : '';
+                    String title = index < filterList[0].length
+                        ? filterList[0][index]
+                        : '';
+                    String uid = index < filterList[1].length
+                        ? filterList[1][index]
+                        : '';
+                    String imageUrl = index < filterList[2].length
+                        ? filterList[2][index]
+                        : '';
+                    String time = index < filterList[3].length
+                        ? filterList[3][index]
+                        : '';
+                    String currentMessage = index < filterList[4].length
+                        ? filterList[4][index]
+                        : '';
 
                     return ListTile(
                       leading: CircleAvatar(
@@ -78,8 +153,8 @@ class _UserChatHomeViewState extends State<UserChatHomeView> {
                             ? NetworkImage(imageUrl)
                             : Image.asset('assets/images/profile.png').image,
                       ),
-                      title: Text(dataTitle),
-                      subtitle: Text(dataSubTitle),
+                      title: Text(title),
+                      subtitle: Text(currentMessage),
                       trailing: Text(time),
                       onTap: () {
                         replace(context, UserChatView(adminId: uid));

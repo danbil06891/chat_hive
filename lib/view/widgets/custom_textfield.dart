@@ -30,7 +30,7 @@ class CustomTextField extends StatefulWidget {
     this.readOnly,
     this.isVisible = false,
     this.labelText = '',
-    required this.hintText,
+    this.hintText = '',
     this.prefixIcon,
     this.suffixIcon,
     this.validator,
